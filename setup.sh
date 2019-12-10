@@ -56,7 +56,7 @@ oc project ${OPENSHIFT_PROJECT} || oc new-project ${OPENSHIFT_PROJECT} ${OPENSHI
 echo "	--> create the config map for the resilient network"
 oc get cm/network-config || oc create configmap network-config --from-file=resources/  || { echo "FAILED: could not create the configuration map " && exit 1; }
 echo "	--> create a build for the resilient network"
-oc get bc/amq-interconnect || oc new-build --code=https://github.com/rlucente-se-jboss/resilient-network-demo.git --name=amq-interconnect --strategy=docker  || { echo "FAILED: could not create build" && exit 1; }
+oc get bc/amq-interconnect || oc new-build --code=https://github.com/liuxiangwin/resilient-network-demo.git --name=amq-interconnect --strategy=docker  || { echo "FAILED: could not create build" && exit 1; }
 echo "	--> waiting for build to succeed, press any key to cancel"
 while [ ! "`oc get build -l buildconfig=amq-interconnect --template='{{range .items}}{{if (eq .metadata.name "amq-interconnect-1")}}{{.status.phase}}{{end}}{{end}}'`" == "Complete" ] ; do echo -n "." && { read -t 1 -n 1 && break ; } && sleep 1s; done; echo ""
 

@@ -33,7 +33,7 @@ oc project ${OPENSHIFT_PROJECT} || { echo "FAILED: project does not exist -- ple
 
 echo "	--> starting up message sender"
 DOCKER_IMAGE_FQN=`oc get is/amq-interconnect --template='{{.status.dockerImageRepository}}'`
-{ oc get dc/${APPLICATION_SENDER_TARGET} || { echo "FAILED: sender target does not exist -- please run full setup to configure basic demo environment" && exit 1 ; } ; } && oc run sender --image=${DOCKER_IMAGE_FQN} --restart=Never --command -- python /usr/share/qpid-proton/examples/python/simple_send.py -a ${APPLICATION_SENDER_TARGET}.${OPENSHIFT_PROJECT}.svc.cluster.local:6000/101st_Airborne_Division/506th_Parachute_Infantry_Regiment/HQ -m 5 || { echo "FAILED: could not send messages" && exit 1 ; }
+{ oc get dc/${APPLICATION_SENDER_TARGET} || { echo "FAILED: sender target does not exist -- please run full setup to configure basic demo environment" && exit 1 ; } ; } && oc run sender --image=${DOCKER_IMAGE_FQN} --restart=Never --command -- python /usr/share/qpid-proton/python/examples/simple_send.py -a ${APPLICATION_SENDER_TARGET}.${OPENSHIFT_PROJECT}.svc.cluster.local:6000/101st_Airborne_Division/506th_Parachute_Infantry_Regiment/HQ -m 5 || { echo "FAILED: could not send messages" && exit 1 ; }
 echo "	--> waiting for messages to be sent, press any key to cancel"
 while [ ! "`oc get po/sender --template='{{range .status.conditions}}{{if (eq .type "Initialized")}}{{.reason}}{{end}}{{end}}'`" == "PodCompleted" ] ; do echo -n "." && { read -t 1 -n 1 && break ; } && sleep 1s; done; echo ""
 oc get po/sender && oc logs po/sender
